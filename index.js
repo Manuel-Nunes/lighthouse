@@ -8,8 +8,9 @@ import chromeLauncher from 'chrome-launcher';
 import { writeFile } from 'fs/promises';
 
 const URLS = ['https://mfdot.com/','https://mfdot.com/food-app/index.html'];
+const descriptors = ['MainSite','FoodApp'];
 
-async function doAnal(URL)
+async function doAnal(URL,descriptor)
 {
   // Launch instance of Chrome
   const chrome = await chromeLauncher.launch();
@@ -17,7 +18,7 @@ async function doAnal(URL)
   // Gather results and report from Lighthouse
   const results = await lighthouse(URL, {
     port: chrome.port,
-    output: 'json'
+    output: 'html'
   }, {
     extends: 'lighthouse:default',
     settings: {
@@ -26,7 +27,7 @@ async function doAnal(URL)
   });
 
   // Save report to file
-  await writeFile('./lighthouse-report.json', results.report);
+  await writeFile(`./reports/${descriptor}.html`, results.report);
 
   // Kill Chrome
   await chrome.kill();
@@ -34,7 +35,7 @@ async function doAnal(URL)
 
 async function Callme(){
   for (let i = 0; i < URLS.length;i++){
-    await doAnal(URLS[i])
+    await doAnal(URLS[i],descriptors[i]);
   }
 }
 
